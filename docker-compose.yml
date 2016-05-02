@@ -1,0 +1,12 @@
+humhub:
+  image: 'local/humhub:1.0.0'
+  restart: always
+  hostname: 'humhub'
+  ports:
+    - '50080:80'
+    - '50443:443'
+  external_links:
+      - mysql:db
+  volumes:
+    - '/docker_volumes/srv/humhub/hh1/config:/usr/local/share/humhub/config'
+    - '/docker_volumes/srv/humhub/hh1/uploads:/usr/local/share/humhub/uploads'
