@@ -80,12 +80,12 @@ RUN chmod 755 /start.sh
 #RUN chown -Rf www-data.www-data /usr/share/nginx/html/
 
 # Download HumHub Community Edition
-RUN wget http://downloads.sourceforge.net/project/humhub/humhub-1.0.0.zip -P /tmp
-RUN rm -rf /tmp/humhub-1.0.0
-RUN unzip /tmp/humhub-1.0.0.zip -d /tmp
-RUN mv /tmp/humhub-1.0.0 /usr/share/nginx
+RUN wget http://downloads.sourceforge.net/project/humhub/humhub-1.0.1.zip -P /tmp
+RUN rm -rf /tmp/humhub-1.0.1
+RUN unzip /tmp/humhub-1.0.1.zip -d /tmp
+RUN mv /tmp/humhub-1.0.1 /usr/share/nginx
 RUN rm -rf /usr/share/nginx/html
-RUN mv /usr/share/nginx/humhub-1.0.0 /usr/share/nginx/html
+RUN mv /usr/share/nginx/humhub-1.0.1 /usr/share/nginx/html
 RUN chown -Rf www-data.www-data /usr/share/nginx/html/
 
 # Crontab
@@ -98,7 +98,7 @@ RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /usr/share/nginx/
 RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /usr/share/nginx/html/index.php
 
 # Run database migration tool
-RUN php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1
+#RUN php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1
 
 # Expose Ports
 EXPOSE 443

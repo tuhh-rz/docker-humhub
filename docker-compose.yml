@@ -1,5 +1,5 @@
 humhub:
-  image: 'local/humhub:1.0.0'
+  image: 'local/humhub:1.0.1'
   restart: always
   hostname: 'humhub'
   ports:
