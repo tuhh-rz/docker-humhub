@@ -80,22 +80,30 @@ RUN chmod 755 /start.sh
 #RUN chown -Rf www-data.www-data /usr/share/nginx/html/
 
 # Download HumHub Community Edition
-RUN wget http://downloads.sourceforge.net/project/humhub/humhub-1.0.1.zip -P /tmp
-RUN rm -rf /tmp/humhub-1.0.1
-RUN unzip /tmp/humhub-1.0.1.zip -d /tmp
-RUN mv /tmp/humhub-1.0.1 /usr/share/nginx
-RUN rm -rf /usr/share/nginx/html
-RUN mv /usr/share/nginx/humhub-1.0.1 /usr/share/nginx/html
-RUN chown -Rf www-data.www-data /usr/share/nginx/html/
+ADD http://downloads.sourceforge.net/project/humhub/humhub-1.0.1.zip /tmp/latest.zip
+RUN unzip /tmp/latest.zip -d /tmp
+RUN mv /tmp/humhub-1.0.1 /tmp/humhub
+
+#RUN wget http://downloads.sourceforge.net/project/humhub/humhub-1.0.1.zip -P /tmp
+#RUN rm -rf /tmp/humhub-1.0.1
+#RUN unzip /tmp/humhub-1.0.1.zip -d /tmp
+#RUN mv /tmp/humhub-1.0.1 /usr/share/nginx
+#RUN rm -rf /usr/share/nginx/html
+#RUN mv /usr/share/nginx/humhub-1.0.1 /usr/share/nginx/html
+#RUN chown -Rf www-data.www-data /usr/share/nginx/html/
 
 # Crontab
-RUN echo "30 * * * * su -s /bin/bash -c '/usr/share/nginx/html/protected/yii cron/hourly' www-data >/dev/null 2>&1" >> /var/spool/cron/crontabs/root
+RUN echo "*/30 * * * * su -s /bin/bash -c '/usr/share/nginx/html/protected/yii cron/hourly' www-data >/dev/null 2>&1" >> /var/spool/cron/crontabs/root
 RUN echo "0 18 * * * su -s /bin/bash -c '/usr/share/nginx/html/protected/yii cron/daily' www-data >/dev/null 2>&1" >> /var/spool/cron/crontabs/root
 
 # Disable Errors / Debugging
-RUN rm /usr/share/nginx/html/index-test.php
-RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /usr/share/nginx/html/index.php
-RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /usr/share/nginx/html/index.php
+#RUN rm /usr/share/nginx/html/index-test.php
+#RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /usr/share/nginx/html/index.php
+#RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /usr/share/nginx/html/index.php
+
+RUN rm /tmp/humhub/index-test.php
+RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /tmp/humhub/index.php
+RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /tmp/humhub/index.php
 
 # Run database migration tool
 #RUN php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1

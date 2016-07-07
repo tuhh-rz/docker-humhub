@@ -1,31 +1,26 @@
 #!/bin/bash
 
-#CONFIG_FOLDER="/usr/local/share/humhub/config"
-#if [ ! -d "$CONFIG_FOLDER" ]; then
-#  ln -s "/usr/share/nginx/html/protected/config" "$CONFIG_FOLDER"
-#else
-#  rm -rf "/usr/share/nginx/html/protected/config"
-#  ln -s  "$CONFIG_FOLDER" "/usr/share/nginx/html/protected/config"
+
+rsync -rc /tmp/humhub/* /usr/share/nginx/html
+
+#SHARED_FOLDER="/usr/local/share/humhub"
+#if [ ! -d "$SHARED_FOLDER" ]; then
+#  mkdir -p "$SHARED_FOLDER"
 #fi
+#
+#if [ "$(find $SHARED_FOLDER/uploads/ -prune -empty)" ]; then
+#  mv /usr/share/nginx/html/uploads/* $SHARED_FOLDER/uploads/
+#fi
+#rm -rf /usr/share/nginx/html/uploads
+#ln -s "$SHARED_FOLDER/uploads" "/usr/share/nginx/html/uploads"
+#
+#if [ "$(find $SHARED_FOLDER/config/ -prune -empty)" ]; then
+#  mv /usr/share/nginx/html/protected/config/* $SHARED_FOLDER/config/
+#fi
+#rm -rf /usr/share/nginx/html/protected/config
+#ln -s "$SHARED_FOLDER/config" "/usr/share/nginx/html/protected/config"
 
-SHARED_FOLDER="/usr/local/share/humhub"
-if [ ! -d "$SHARED_FOLDER" ]; then
-  mkdir -p "$SHARED_FOLDER"
-fi
-
-if [ "$(find $SHARED_FOLDER/uploads/ -prune -empty)" ]; then
-  mv /usr/share/nginx/html/uploads/* $SHARED_FOLDER/uploads/
-fi
-rm -rf /usr/share/nginx/html/uploads
-ln -s "$SHARED_FOLDER/uploads" "/usr/share/nginx/html/uploads"
-
-if [ "$(find $SHARED_FOLDER/config/ -prune -empty)" ]; then
-  mv /usr/share/nginx/html/protected/config/* $SHARED_FOLDER/config/
-fi
-rm -rf /usr/share/nginx/html/protected/config
-ln -s "$SHARED_FOLDER/config" "/usr/share/nginx/html/protected/config"
-
-chown -Rf www-data.www-data /usr/share/nginx/html/
+chown -R www-data:www-data /usr/share/nginx/html/
 
 # Disable Strict Host checking for non interactive git clones
 
@@ -83,7 +78,7 @@ sed -i -e "s/worker_processes 5/worker_processes $procs/" /etc/nginx/nginx.conf
 #fi
 
 # Again set the right permissions (needed when mounting from a volume)
-chown -Rf www-data.www-data /usr/share/nginx/html/
+chown -R www-data:www-data /usr/share/nginx/html/
 
 php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1
 
