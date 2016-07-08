@@ -1,0 +1,5 @@
+deployment_system:
+    script:
+        - docker build --no-cache -t local/humhub:$CI_BUILD_ID .
+        - docker tag local/humhub:$CI_BUILD_ID localhost:5000/humhub:latest
+        - docker push localhost:5000/humhub:latest
