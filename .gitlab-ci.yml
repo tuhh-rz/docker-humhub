@@ -1,8 +1,8 @@
 deployment_system:
     only:
-        - deployment
+        - master
     tags:
-        - deployment
+        - master
     script:
         - docker build --no-cache -t local/humhub:$CI_PROJECT_ID.$CI_BUILD_ID .
         - docker tag local/humhub:$CI_PROJECT_ID.$CI_BUILD_ID localhost:5000/humhub:latest
