@@ -4,4 +4,4 @@ deployment_system:
     tags:
         - master
     script:
-        - imagebuilder $CI_BUILD_REPO $CI_PROJECT_DIR $CI_PROJECT_ID $CI_BUILD_ID .
+        - ~/imagebuilder $CI_BUILD_REPO $CI_PROJECT_DIR $CI_PROJECT_ID $CI_BUILD_ID .
