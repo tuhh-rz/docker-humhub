@@ -80,17 +80,9 @@ RUN chmod 755 /start.sh
 #RUN chown -Rf www-data.www-data /usr/share/nginx/html/
 
 # Download HumHub Community Edition
-ADD http://downloads.sourceforge.net/project/humhub/humhub-1.0.1.zip /tmp/latest.zip
+ADD http://downloads.sourceforge.net/project/humhub/humhub-1.1.0.zip /tmp/latest.zip
 RUN unzip /tmp/latest.zip -d /tmp
-RUN mv /tmp/humhub-1.0.1 /tmp/humhub
-
-#RUN wget http://downloads.sourceforge.net/project/humhub/humhub-1.0.1.zip -P /tmp
-#RUN rm -rf /tmp/humhub-1.0.1
-#RUN unzip /tmp/humhub-1.0.1.zip -d /tmp
-#RUN mv /tmp/humhub-1.0.1 /usr/share/nginx
-#RUN rm -rf /usr/share/nginx/html
-#RUN mv /usr/share/nginx/humhub-1.0.1 /usr/share/nginx/html
-#RUN chown -Rf www-data.www-data /usr/share/nginx/html/
+RUN mv /tmp/humhub-1.1.0 /tmp/humhub
 
 # Crontab
 #RUN echo "*/30 * * * * su -s /bin/bash -c '/usr/share/nginx/html/protected/yii cron/hourly' www-data >/dev/null 2>&1" >> /var/spool/cron/crontabs/root
