@@ -1,6 +1,6 @@
 deployment_system:
     only:
-        - master
+        - tags
     tags:
         - master
     script:
