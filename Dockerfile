@@ -1,5 +1,6 @@
 FROM ubuntu:14.04.4
-MAINTAINER Ric Harvey <ric@ngineered.co.uk>
+
+HUMHUB_VERSION=1.1.1
 
 # Surpress Upstart errors/warning
 RUN dpkg-divert --local --rename --add /sbin/initctl
@@ -80,7 +81,7 @@ RUN chmod 755 /start.sh
 #RUN chown -Rf www-data.www-data /usr/share/nginx/html/
 
 # Download HumHub Community Edition
-ADD http://downloads.sourceforge.net/project/humhub/humhub-1.1.0.zip /tmp/latest.zip
+ADD http://downloads.sourceforge.net/project/humhub/humhub-${HUMHUB_VERSION}.zip /tmp/latest.zip
 RUN unzip /tmp/latest.zip -d /tmp
 RUN mv /tmp/humhub-1.1.0 /tmp/humhub
 
