@@ -83,7 +83,7 @@ RUN chmod 755 /start.sh
 # Download HumHub Community Edition
 ADD http://downloads.sourceforge.net/project/humhub/humhub-${HUMHUB_VERSION}.zip /tmp/latest.zip
 RUN unzip /tmp/latest.zip -d /tmp
-RUN mv /tmp/humhub-1.1.0 /tmp/humhub
+RUN mv /tmp/humhub-${HUMHUB_VERSION} /tmp/humhub
 
 # Crontab
 #RUN echo "*/30 * * * * su -s /bin/bash -c '/usr/share/nginx/html/protected/yii cron/hourly' www-data >/dev/null 2>&1" >> /var/spool/cron/crontabs/root
