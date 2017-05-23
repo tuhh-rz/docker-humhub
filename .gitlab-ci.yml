@@ -2,7 +2,7 @@ variables:
     # we need lower case!!!
     CI_PROJECT_NAMESPACE: docker
     CONTAINER_TEST_IMAGE: docker.rz.tu-harburg.de:5000/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_PIPELINE_ID
-    CONTAINER_TAG_IMAGE: docker.rz.tu-harburg.de:5000/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+    CONTAINER_VERSIONED_IMAGE: docker.rz.tu-harburg.de:5000/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
     CONTAINER_RELEASE_IMAGE: docker.rz.tu-harburg.de:5000/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:latest
 
 stages:
@@ -36,10 +36,10 @@ deploy:
 deploy:
     stage: deploy
     script:
-        - sudo docker pull $CONTAINER_TEST_IMAGE
-        - sudo docker tag $CONTAINER_TEST_IMAGE $CONTAINER_TAG_IMAGE
-        - sudo docker push $CONTAINER_TAG_IMAGE
+        - if [[ "${CI_COMMIT_REF_NAME}" =~ ^[0-9]+\.[0-9]+\.[0-9]+-{0,1}.*$ ]]; then sudo docker pull $CONTAINER_TEST_IMAGE; sudo docker tag $CONTAINER_TEST_IMAGE $CONTAINER_VERSIONED_IMAGE; sudo docker push $CONTAINER_VERSIONED_IMAGE; fi
     tags:
         - deploy
     only:
-        - tags
+        - branches
+    except:
+        - master
