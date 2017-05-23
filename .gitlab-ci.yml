@@ -2,6 +2,7 @@ variables:
     # we need lower case!!!
     CI_PROJECT_NAMESPACE: docker
     CONTAINER_TEST_IMAGE: docker.rz.tu-harburg.de:5000/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_PIPELINE_ID
+    CONTAINER_TAG_IMAGE: docker.rz.tu-harburg.de:5000/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
     CONTAINER_RELEASE_IMAGE: docker.rz.tu-harburg.de:5000/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:latest
 
 stages:
@@ -17,7 +18,7 @@ build:
     tags:
         - build
     script:
-        - sudo docker build --no-cache --pull -t $CONTAINER_TEST_IMAGE .
+        - sudo docker build --pull -t $CONTAINER_TEST_IMAGE .
         - sudo docker push $CONTAINER_TEST_IMAGE
         
 deploy:
@@ -31,3 +32,14 @@ deploy:
     only:
         - triggers
         - master
+        
+deploy:
+    stage: deploy
+    script:
+        - sudo docker pull $CONTAINER_TEST_IMAGE
+        - sudo docker tag $CONTAINER_TEST_IMAGE $CONTAINER_TAG_IMAGE
+        - sudo docker push $CONTAINER_TAG_IMAGE
+    tags:
+        - deploy
+    only:
+        - tags
