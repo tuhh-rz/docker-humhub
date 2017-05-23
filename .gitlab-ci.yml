@@ -9,7 +9,7 @@ stages:
     - build
     - deploy
 
-build:
+docker_image:
     stage: build
     only:
         - tags
