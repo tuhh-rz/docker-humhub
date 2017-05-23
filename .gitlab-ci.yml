@@ -21,7 +21,7 @@ build:
         - sudo docker build --pull -t $CONTAINER_TEST_IMAGE .
         - sudo docker push $CONTAINER_TEST_IMAGE
         
-deploy:
+deploy_latest:
     stage: deploy
     script:
         - sudo docker pull $CONTAINER_TEST_IMAGE
@@ -33,7 +33,7 @@ deploy:
         - triggers
         - master
         
-deploy:
+deploy_version:
     stage: deploy
     script:
         - if [[ "${CI_COMMIT_REF_NAME}" =~ ^[0-9]+\.[0-9]+\.[0-9]+-{0,1}.*$ ]]; then sudo docker pull $CONTAINER_TEST_IMAGE; sudo docker tag $CONTAINER_TEST_IMAGE $CONTAINER_VERSIONED_IMAGE; sudo docker push $CONTAINER_VERSIONED_IMAGE; fi
