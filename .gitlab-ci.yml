@@ -3,7 +3,7 @@ variables:
     CI_PROJECT_NAMESPACE: docker
 
     CONTAINER_RELEASE_IMAGE: docker.rz.tu-harburg.de:5000/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
-    LATEST_VERSION: '1.1.2'
+    LATEST_VERSION: '1.1'
 
 .build_script_template:
     script:  &build_script_definition
@@ -40,7 +40,7 @@ stages:
     - build
     - deploy
 
-build:1.1.2:
+build:1.1:
     stage: build
     retry: 2
     only:
@@ -48,23 +48,23 @@ build:1.1.2:
     tags:
         - build
     variables:
-        VERSION: '1.1.2'
-        VARIANT: ''
+        VERSION: '1.1'
+        VARIANT: '2'
     before_script: *build_before_script_definition
     script: *build_script_definition
 
-deploy:1.1.2:
+deploy:1.1:
     stage: deploy
     tags:
         - deploy
     only:
         - master
     variables:
-        VERSION: '1.1.2'
-        VARIANT: ''
+        VERSION: '1.1'
+        VARIANT: '2'
     script: *deploy_script_definition
 
-build:branches:1.1.2:
+build:branches:1.1:
     stage: build
     retry: 2
     only:
@@ -74,12 +74,12 @@ build:branches:1.1.2:
     tags:
         - build
     variables:
-        VERSION: '1.1.2'
-        VARIANT: ''
+        VERSION: '1.1'
+        VARIANT: '2'
     before_script: *build_branches_before_script_definition
     script: *build_branches_script_definition
 
-deploy:branches:1.1.2:
+deploy:branches:1.1:
     stage: deploy
     tags:
         - deploy
@@ -88,11 +88,11 @@ deploy:branches:1.1.2:
     except:
         - master
     variables:
-        VERSION: '1.1.2'
+        VERSION: '1.1'
         VARIANT: ''
     script: *deploy_branches_script_definition
 
-build:1.2.1:
+build:1.2:
     stage: build
     retry: 2
     only:
@@ -100,23 +100,23 @@ build:1.2.1:
     tags:
         - build
     variables:
-        VERSION: '1.2.1'
+        VERSION: '1.2'
         VARIANT: ''
     before_script: *build_before_script_definition
     script: *build_script_definition
 
-deploy:1.2.1:
+deploy:1.2:
     stage: deploy
     tags:
         - deploy
     only:
         - master
     variables:
-        VERSION: '1.2.1'
+        VERSION: '1.2'
         VARIANT: ''
     script: *deploy_script_definition
 
-build:branches:1.2.1:
+build:branches:1.2:
     stage: build
     retry: 2
     only:
@@ -126,12 +126,12 @@ build:branches:1.2.1:
     tags:
         - build
     variables:
-        VERSION: '1.2.1'
+        VERSION: '1.2'
         VARIANT: ''
     before_script: *build_branches_before_script_definition
     script: *build_branches_script_definition
 
-deploy:branches:1.2.1:
+deploy:branches:1.2:
     stage: deploy
     tags:
         - deploy
@@ -140,6 +140,6 @@ deploy:branches:1.2.1:
     except:
         - master
     variables:
-        VERSION: '1.2.1'
+        VERSION: '1.2'
         VARIANT: ''
     script: *deploy_branches_script_definition
