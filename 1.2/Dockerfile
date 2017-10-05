@@ -74,9 +74,12 @@ ADD scripts/start.sh /start.sh
 RUN chmod 755 /start.sh
 
 # Download HumHub Community Edition
-ADD https://www.humhub.org/en/download/form?version=${HUMHUB_VERSION}&type=zip /tmp/latest.zip
-RUN unzip /tmp/latest.zip -d /tmp
+RUN wget "https://www.humhub.org/en/download/form?version=${HUMHUB_VERSION}&type=tar.gz" -O /tmp/latest.tar.gz
+#RUN file "/tmp/latest.tar.gz"
+#ADD "https://www.humhub.org/de/download/default/start?version=${HUMHUB_VERSION}&type=tar.gz&ee=0" /tmp/latest.tar.gz
+RUN tar xf /tmp/latest.tar.gz -C /tmp
 RUN mv /tmp/humhub-${HUMHUB_VERSION} /tmp/humhub
+
 
 
 # Crontab
