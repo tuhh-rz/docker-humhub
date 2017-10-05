@@ -93,7 +93,6 @@ RUN echo "13 *    * * *   www-data /usr/share/nginx/html/protected/yii cron/hour
 #RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /usr/share/nginx/html/index.php
 #RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /usr/share/nginx/html/index.php
 
-RUN rm /tmp/humhub/index-test.php
 RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /tmp/humhub/index.php
 RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /tmp/humhub/index.php
 
