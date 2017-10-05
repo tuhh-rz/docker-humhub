@@ -49,7 +49,7 @@ build:1.1:
         - build
     variables:
         VERSION: '1.1'
-        VARIANT: '2'
+        VARIANT: ''
     before_script: *build_before_script_definition
     script: *build_script_definition
 
@@ -61,7 +61,7 @@ deploy:1.1:
         - master
     variables:
         VERSION: '1.1'
-        VARIANT: '2'
+        VARIANT: ''
     script: *deploy_script_definition
 
 build:branches:1.1:
@@ -75,7 +75,7 @@ build:branches:1.1:
         - build
     variables:
         VERSION: '1.1'
-        VARIANT: '2'
+        VARIANT: ''
     before_script: *build_branches_before_script_definition
     script: *build_branches_script_definition
 
