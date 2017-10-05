@@ -73,19 +73,11 @@ ADD conf/supervisord.conf /etc/supervisord.conf
 ADD scripts/start.sh /start.sh
 RUN chmod 755 /start.sh
 
-# Setup Volume
-# VOLUME ["/usr/share/nginx/html"]
-
-# add test PHP file
-#ADD src/index.php /usr/share/nginx/html/index.php
-#RUN chown -Rf www-data.www-data /usr/share/nginx/html/
-
 # Download HumHub Community Edition
-RUN wget "https://www.humhub.org/de/download/default/start?version=${HUMHUB_VERSION}&type=tar.gz&ee=0" -O /tmp/latest.tar.gz
-#RUN file "/tmp/latest.tar.gz"
-#ADD "https://www.humhub.org/de/download/default/start?version=${HUMHUB_VERSION}&type=tar.gz&ee=0" /tmp/latest.tar.gz
-RUN tar xf /tmp/latest.tar.gz -C /tmp
+ADD http://downloads.sourceforge.net/project/humhub/humhub-${HUMHUB_VERSION}.zip /tmp/latest.zip
+RUN unzip /tmp/latest.zip -d /tmp
 RUN mv /tmp/humhub-${HUMHUB_VERSION} /tmp/humhub
+
 
 # Crontab
 #RUN echo "*/30 * * * * su -s /bin/bash -c '/usr/share/nginx/html/protected/yii cron/hourly' www-data >/dev/null 2>&1" >> /var/spool/cron/crontabs/root
