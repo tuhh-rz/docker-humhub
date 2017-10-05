@@ -74,7 +74,7 @@ ADD scripts/start.sh /start.sh
 RUN chmod 755 /start.sh
 
 # Download HumHub Community Edition
-ADD http://downloads.sourceforge.net/project/humhub/humhub-${HUMHUB_VERSION}.zip /tmp/latest.zip
+ADD https://www.humhub.org/en/download/form?version=${HUMHUB_VERSION}&type=zip /tmp/latest.zip
 RUN unzip /tmp/latest.zip -d /tmp
 RUN mv /tmp/humhub-${HUMHUB_VERSION} /tmp/humhub
 
