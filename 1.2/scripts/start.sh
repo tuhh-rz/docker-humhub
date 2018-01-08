@@ -1,9 +1,6 @@
 #!/bin/bash
 
-
 rsync -rc /tmp/humhub/* /usr/share/nginx/html
-
-chown -R www-data:www-data /usr/share/nginx/html/
 
 # Display PHP error's or not
 if [[ "$ERRORS" != "1" ]] ; then
@@ -16,14 +13,13 @@ fi
 procs=$(cat /proc/cpuinfo |grep processor | wc -l)
 sed -i -e "s/worker_processes 5/worker_processes $procs/" /etc/nginx/nginx.conf
 
-# Again set the right permissions (needed when mounting from a volume)
-chown -R www-data:www-data /usr/share/nginx/html/
-
-rm -rf /usr/share/nginx/html/protected/runtime/cache
 
 mkdir -p /run/php/
 
-yes | php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1
+rm -rf /usr/share/nginx/html/protected/runtime/cache
+
+su -s /bin/sh -c 'yes | php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1' www-data
+chown -R www-data:www-data /usr/share/nginx/html/
 
 # Start supervisord and services
 /usr/bin/supervisord -n -c /etc/supervisord.conf
