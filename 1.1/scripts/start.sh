@@ -83,4 +83,4 @@ chown -R www-data:www-data /usr/share/nginx/html/
 php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1
 
 # Start supervisord and services
-/usr/bin/supervisord -n -c /etc/supervisord.conf
+exec /usr/bin/supervisord -n -c /etc/supervisord.conf
