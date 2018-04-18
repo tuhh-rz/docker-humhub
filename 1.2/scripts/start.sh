@@ -22,4 +22,4 @@ su -s /bin/sh -c 'yes | php /usr/share/nginx/html/protected/yii migrate/up --inc
 chown -R www-data:www-data /usr/share/nginx/html/
 
 # Start supervisord and services
-/usr/bin/supervisord -n -c /etc/supervisord.conf
+exec /usr/bin/supervisord -n -c /etc/supervisord.conf
