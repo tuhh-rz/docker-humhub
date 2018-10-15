@@ -87,6 +87,8 @@ RUN mv /tmp/humhub-${HUMHUB_VERSION} /tmp/humhub
 #RUN echo "0 18 * * * su -s /bin/bash -c '/usr/share/nginx/html/protected/yii cron/daily' www-data >/dev/null 2>&1" >> /var/spool/cron/crontabs/root
 RUN echo "0  6    * * *   www-data /usr/bin/php /usr/share/nginx/html/protected/yii cron/daily" >> /etc/crontab
 RUN echo "13 *    * * *   www-data /usr/bin/php /usr/share/nginx/html/protected/yii cron/hourly" >> /etc/crontab
+RUN echo "* * * * *   www-data /usr/bin/php /usr/share/nginx/html/protected/yii queue/run" >> /etc/crontab
+RUN echo "* * * * *   www-data /usr/bin/php /usr/share/nginx/html/protected/yii cron/run" >> /etc/crontab
 
 # Disable Errors / Debugging
 #RUN rm /usr/share/nginx/html/index-test.php
