@@ -18,7 +18,10 @@ mkdir -p /run/php/
 
 rm -rf /usr/share/nginx/html/protected/runtime/cache
 
+# http://docs.humhub.org/admin-updating.html
 su -s /bin/sh -c 'yes | php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1' www-data
+su -s /bin/sh -c 'php /usr/share/nginx/html/protected/yii module/update-all' www-data
+
 chown -R www-data:www-data /usr/share/nginx/html/
 
 # Start supervisord and services
