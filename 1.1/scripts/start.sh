@@ -20,7 +20,7 @@ rsync -rc /tmp/humhub/* /usr/share/nginx/html
 #rm -rf /usr/share/nginx/html/protected/config
 #ln -s "$SHARED_FOLDER/config" "/usr/share/nginx/html/protected/config"
 
-chown -R www-data:www-data /usr/share/nginx/html/
+find /usr/share/nginx/html/ ! -user www-data -exec chown www-data: {} \;
 
 # Disable Strict Host checking for non interactive git clones
 
@@ -78,7 +78,7 @@ sed -i -e "s/worker_processes 5/worker_processes $procs/" /etc/nginx/nginx.conf
 #fi
 
 # Again set the right permissions (needed when mounting from a volume)
-chown -R www-data:www-data /usr/share/nginx/html/
+find /usr/share/nginx/html/ ! -user www-data -exec chown www-data: {} \;
 
 php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1
 
