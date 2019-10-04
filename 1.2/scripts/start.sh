@@ -19,7 +19,8 @@ mkdir -p /run/php/
 rm -rf /usr/share/nginx/html/protected/runtime/cache
 
 su -s /bin/sh -c 'yes | php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1' www-data
-chown -R www-data:www-data /usr/share/nginx/html/
+
+find /usr/share/nginx/html/ ! -user www-data -exec chown www-data: {} \;
 
 # Start supervisord and services
 exec /usr/bin/supervisord -n -c /etc/supervisord.conf
