@@ -1,6 +1,9 @@
 FROM ubuntu:16.04
 
-ENV HUMHUB_VERSION 1.3.18
+#ENV HUMHUB_VERSION 1.3.18
+ARG VERSION=1.3.18
+RUN echo $VERSION
+
 
 # Surpress Upstart errors/warning
 RUN dpkg-divert --local --rename --add /sbin/initctl
