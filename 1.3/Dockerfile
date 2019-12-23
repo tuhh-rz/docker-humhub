@@ -1,9 +1,8 @@
 FROM ubuntu:16.04
 
-#ENV VERSION 1.3.18
-ARG VERSION=1.3.18
+ARG VERSION=${VERSION:-1.3.18}
+ENV VERSION=$VERSION
 RUN echo $VERSION
-
 
 # Surpress Upstart errors/warning
 RUN dpkg-divert --local --rename --add /sbin/initctl
