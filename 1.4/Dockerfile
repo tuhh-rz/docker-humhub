@@ -75,8 +75,8 @@ RUN sed -i -e "s/;listen.mode = 0660/listen.mode = 0750/g" /etc/php/7.2/fpm/pool
 RUN rm -Rf /etc/nginx/conf.d/* && \
     rm -Rf /etc/nginx/sites-available/default && \
     mkdir -p /etc/nginx/ssl/
-ADD conf/nginx-site.conf /etc/nginx/sites-available/default.conf
-RUN ln -s /etc/nginx/sites-available/default.conf /etc/nginx/sites-enabled/default.conf
+ADD conf/nginx-site.conf /etc/nginx/sites-available/default
+RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 # Add git commands to allow container updating
 #ADD scripts/pull /usr/bin/pull
