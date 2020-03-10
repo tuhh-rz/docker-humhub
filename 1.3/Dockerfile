@@ -1,8 +1,12 @@
 FROM ubuntu:16.04
 
-ARG VERSION=${VERSION:-1.3.18}
+ARG VERSION=${VERSION}
 ENV VERSION=$VERSION
 RUN echo $VERSION
+
+#ARG DOWNLOAD=${DOWNLOAD}
+#ENV DOWNLOAD=$DOWNLOAD
+#RUN echo $DOWNLOAD
 
 # Surpress Upstart errors/warning
 RUN dpkg-divert --local --rename --add /sbin/initctl
