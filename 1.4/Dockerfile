@@ -8,23 +8,34 @@ RUN echo $VERSION
 #ENV DOWNLOAD=$DOWNLOAD
 #RUN echo $DOWNLOAD
 
-# Surpress Upstart errors/warning
+# Keep upstart from complaining
 RUN dpkg-divert --local --rename --add /sbin/initctl
 RUN ln -sf /bin/true /sbin/initctl
 
 # Let the conatiner know that there is no tty
 ENV DEBIAN_FRONTEND noninteractive
 
+RUN apt-get update
+RUN apt-get -y upgrade
+
+RUN apt-get install -y \
+    cron \
+    git \
+    pwgen \
+    rsync \
+    supervisor \
+    unzip \
+    wget
+
 # Update base image
 # Add sources for latest nginx
 # Install software requirements
-RUN apt-get update && \
-    apt-get install -y software-properties-common && \
+RUN apt-get install -y software-properties-common && \
     nginx=stable && \
     add-apt-repository ppa:nginx/$nginx && \
     apt-get update && \
     apt-get upgrade -y && \
-    BUILD_PACKAGES="supervisor nginx git php-mysql php-apcu php-curl php-fpm php-gd php-intl php-mbstring php-memcache php-sqlite3 php-tidy php-xmlrpc php-xsl php-pgsql php-mongodb php-ldap php-zip pwgen wget unzip cron" && \
+    BUILD_PACKAGES="nginx php-mysql php-apcu php-curl php-fpm php-gd php-intl php-mbstring php-memcache php-sqlite3 php-tidy php-xmlrpc php-xsl php-pgsql php-mongodb php-ldap php-zip" && \
     apt-get -y install $BUILD_PACKAGES && \
     apt-get remove --purge -y software-properties-common && \
     apt-get autoremove -y && \
