@@ -73,7 +73,7 @@ RUN sed -i -e "s/;listen.mode = 0660/listen.mode = 0750/g" /etc/php/7.2/fpm/pool
 
 # nginx site conf
 RUN rm -Rf /etc/nginx/conf.d/* && \
-    rm -Rf /etc/nginx/sites-available/default && \
+    rm -Rf /etc/nginx/sites-enabled/default && \
     mkdir -p /etc/nginx/ssl/
 ADD conf/nginx-site.conf /etc/nginx/sites-available/default
 RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
