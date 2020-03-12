@@ -9,8 +9,7 @@ if [[ "$ERRORS" != "1" ]]; then
 fi
 
 # Tweak nginx to match the workers to cpu's
-
-procs=$(cat /proc/cpuinfo | grep processor | wc -l)
+procs=$(grep -c processor /proc/cpuinfo)
 sed -i -e "s/worker_processes 5/worker_processes $procs/" /etc/nginx/nginx.conf
 
 mkdir -p /run/php/
