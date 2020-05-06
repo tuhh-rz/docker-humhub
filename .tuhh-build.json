@@ -22,6 +22,9 @@
         },
         "1.4": {
             "action": "build"
+        },
+        "1.5": {
+            "action": "build"
         }
     }
 }
