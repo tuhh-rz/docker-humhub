@@ -3,6 +3,7 @@
     "version-check": {
         "active": true,
         "master_key": "HumHub",
+        "sub_key": "HumHub",
         "version_digits_in_key": 2
     },
     "registries": [
