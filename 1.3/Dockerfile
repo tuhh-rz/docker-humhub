@@ -4,9 +4,9 @@ ARG VERSION=${VERSION}
 ENV VERSION=$VERSION
 RUN echo $VERSION
 
-#ARG DOWNLOAD=${DOWNLOAD}
-#ENV DOWNLOAD=$DOWNLOAD
-#RUN echo $DOWNLOAD
+ARG DOWNLOAD=${DOWNLOAD}
+ENV DOWNLOAD=$DOWNLOAD
+RUN echo $DOWNLOAD
 
 # Surpress Upstart errors/warning
 RUN dpkg-divert --local --rename --add /sbin/initctl
