@@ -2,9 +2,9 @@ FROM ubuntu:18.04
 
 ARG VERSION
 
-#ARG DOWNLOAD=${DOWNLOAD}
-#ENV DOWNLOAD=$DOWNLOAD
-#RUN echo $DOWNLOAD
+ARG DOWNLOAD=${DOWNLOAD}
+ENV DOWNLOAD=$DOWNLOAD
+RUN echo $DOWNLOAD
 
 # Keep upstart from complaining
 RUN dpkg-divert --local --rename --add /sbin/initctl

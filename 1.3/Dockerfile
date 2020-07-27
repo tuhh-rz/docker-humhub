@@ -2,9 +2,9 @@ FROM ubuntu:16.04
 
 ARG VERSION
 
-#ARG DOWNLOAD=${DOWNLOAD}
-#ENV DOWNLOAD=$DOWNLOAD
-#RUN echo $DOWNLOAD
+ARG DOWNLOAD=${DOWNLOAD}
+ENV DOWNLOAD=$DOWNLOAD
+RUN echo $DOWNLOAD
 
 # Surpress Upstart errors/warning
 RUN dpkg-divert --local --rename --add /sbin/initctl
