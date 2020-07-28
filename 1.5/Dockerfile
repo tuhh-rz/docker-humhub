@@ -17,6 +17,7 @@ RUN apt-get update && apt-get -y upgrade
 
 RUN apt-get install -y \
     cron \
+    curl \
     git \
     pwgen \
     rsync \

@@ -22,7 +22,7 @@ nginx=stable && \
 add-apt-repository ppa:nginx/$nginx && \
 apt-get update && \
 apt-get upgrade -y && \
-BUILD_PACKAGES="supervisor nginx git php-mysql php-apcu php-curl php-fpm php-gd php-intl php-mbstring php-mcrypt php-memcache php-sqlite3 php-tidy php-xmlrpc php-xsl php-pgsql php-mongodb php-ldap php-zip pwgen wget unzip cron" && \
+BUILD_PACKAGES="supervisor nginx git php-mysql php-apcu php-curl php-fpm php-gd php-intl php-mbstring php-mcrypt php-memcache php-sqlite3 php-tidy php-xmlrpc php-xsl php-pgsql php-mongodb php-ldap php-zip pwgen wget unzip cron curl" && \
 apt-get -y install $BUILD_PACKAGES && \
 apt-get remove --purge -y software-properties-common && \
 apt-get autoremove -y && \
