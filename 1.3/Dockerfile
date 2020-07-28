@@ -80,13 +80,9 @@ ADD scripts/start.sh /start.sh
 RUN chmod 755 /start.sh
 
 # Download HumHub Community Edition
-RUN wget "https://www.humhub.org/en/download/start?version=${VERSION}&type=tar.gz&ee=0" -O /tmp/latest.tar.gz
-#RUN file "/tmp/latest.tar.gz"
-#ADD "https://www.humhub.org/de/download/default/start?version=${VERSION}&type=tar.gz&ee=0" /tmp/latest.tar.gz
-RUN tar xf /tmp/latest.tar.gz -C /tmp
-RUN mv /tmp/humhub-${VERSION} /tmp/humhub
-
-
+RUN curl $DOWNLOAD |\
+  tar -xzC /tmp && \
+  mv /tmp/humhub-${VERSION} /tmp/humhub
 
 # Crontab
 #RUN echo "*/30 * * * * su -s /bin/bash -c '/usr/share/nginx/html/protected/yii cron/hourly' www-data >/dev/null 2>&1" >> /var/spool/cron/crontabs/root

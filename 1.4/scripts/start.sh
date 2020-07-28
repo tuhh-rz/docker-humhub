@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rsync -rc /tmp/humhub/* /usr/share/nginx/html
+rsync -au /tmp/humhub/ /usr/share/nginx/html
 
 # Display PHP error's or not
 if [[ "$ERRORS" != "1" ]]; then

@@ -90,6 +90,7 @@ ADD conf/supervisord.conf /etc/supervisord.conf
 ADD scripts/start.sh /start.sh
 RUN chmod 755 /start.sh
 
+# Download HumHub Community Edition
 RUN curl $DOWNLOAD |\
   tar -xzC /tmp && \
   mv /tmp/humhub-${VERSION} /tmp/humhub
