@@ -1,8 +1,6 @@
 FROM ubuntu:18.04
 
-ARG VERSION=${VERSION}
-ENV VERSION=$VERSION
-RUN echo $VERSION
+ARG VERSION
 
 ARG DOWNLOAD=${DOWNLOAD}
 ENV DOWNLOAD=$DOWNLOAD
@@ -119,3 +117,9 @@ EXPOSE 443
 EXPOSE 80
 
 CMD ["/bin/bash", "/start.sh"]
+
+LABEL \
+    de.tuhh.ci_repository_url=$CI_REPOSITORY_URL \
+    de.tuhh.ci_commit_short_sha=$CI_COMMIT_SHORT_SHA \
+    de.tuhh.build-date=$BUILD_DATE \
+    de.tuhh.version=$VERSION
