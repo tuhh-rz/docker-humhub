@@ -1,7 +1,9 @@
 FROM ubuntu:18.04
 
 ARG VERSION
+RUN echo $VERSION
 ARG DOWNLOAD
+RUN echo $DOWNLOAD
 
 # Keep upstart from complaining
 RUN dpkg-divert --local --rename --add /sbin/initctl
