@@ -1,9 +1,8 @@
 FROM ubuntu:18.04
 
 ARG VERSION
-
-ARG DOWNLOAD=${DOWNLOAD}
-ENV DOWNLOAD=$DOWNLOAD
+RUN echo $VERSION
+ARG DOWNLOAD
 RUN echo $DOWNLOAD
 
 # Keep upstart from complaining
@@ -13,18 +12,16 @@ RUN ln -sf /bin/true /sbin/initctl
 # Let the conatiner know that there is no tty
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update
-RUN apt-get -y upgrade
+RUN apt-get update && apt-get -y upgrade
 
 RUN apt-get install -y \
     cron \
-    curl \
     git \
     pwgen \
     rsync \
     supervisor \
     unzip \
-    wget
+    curl
 
 # Update base image
 # Add sources for latest nginx
@@ -77,11 +74,6 @@ RUN rm -Rf /etc/nginx/conf.d/* && \
 ADD conf/nginx-site.conf /etc/nginx/sites-available/default
 RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-# Add git commands to allow container updating
-#ADD scripts/pull /usr/bin/pull
-#ADD scripts/push /usr/bin/push
-#RUN chmod 755 /usr/bin/pull && chmod 755 /usr/bin/push
-
 # Supervisor Config
 ADD conf/supervisord.conf /etc/supervisord.conf
 
@@ -91,8 +83,7 @@ RUN chmod 755 /start.sh
 
 # Download HumHub Community Edition
 RUN curl $DOWNLOAD |\
-  tar -xzC /tmp && \
-  mv /tmp/humhub-${VERSION} /tmp/humhub
+    tar -xzC /opt && ln -s /opt/humhub-$VERSION /opt/humhub
 
 # Crontab
 #RUN echo "*/30 * * * * su -s /bin/bash -c '/usr/share/nginx/html/protected/yii cron/hourly' www-data >/dev/null 2>&1" >> /var/spool/cron/crontabs/root
@@ -107,11 +98,13 @@ RUN echo "* * * * *   www-data /usr/bin/php /usr/share/nginx/html/protected/yii 
 #RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /usr/share/nginx/html/index.php
 #RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /usr/share/nginx/html/index.php
 
-RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /tmp/humhub/index.php
-RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /tmp/humhub/index.php
+RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /opt/humhub-$VERSION/index.php
+RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /opt/humhub-$VERSION/index.php
 
 # Run database migration tool
 #RUN php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1
+
+RUN find /opt/humhub-$VERSION ! -user www-data -exec chown www-data: {} +
 
 # Expose Ports
 EXPOSE 443
