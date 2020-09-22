@@ -104,8 +104,8 @@ RUN echo "* * * * *   www-data /usr/bin/php /usr/share/nginx/html/protected/yii 
 #RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /usr/share/nginx/html/index.php
 #RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /usr/share/nginx/html/index.php
 
-RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /tmp/humhub/index.php
-RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /tmp/humhub/index.php
+RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /opt/humhub-$version/index.php
+RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /opt/humhub-$version/index.php
 
 # Run database migration tool
 #RUN php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1
