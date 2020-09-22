@@ -57,10 +57,6 @@ stages:
     - build
     - deploy
 
-stages:
-    - build
-    - deploy
-
 build:1.6:
     stage: build
     retry: 2
