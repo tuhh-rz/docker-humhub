@@ -75,11 +75,6 @@ RUN rm -Rf /etc/nginx/conf.d/* && \
 ADD conf/nginx-site.conf /etc/nginx/sites-available/default
 RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-# Add git commands to allow container updating
-#ADD scripts/pull /usr/bin/pull
-#ADD scripts/push /usr/bin/push
-#RUN chmod 755 /usr/bin/pull && chmod 755 /usr/bin/push
-
 # Supervisor Config
 ADD conf/supervisord.conf /etc/supervisord.conf
 
@@ -104,13 +99,13 @@ RUN echo "* * * * *   www-data /usr/bin/php /usr/share/nginx/html/protected/yii 
 #RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /usr/share/nginx/html/index.php
 #RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /usr/share/nginx/html/index.php
 
-RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /opt/humhub-$version/index.php
-RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /opt/humhub-$version/index.php
+RUN sed -i "s/^defined('YII_DEBUG')/\/\/defined('YII_DEBUG')/" /opt/humhub-$VERSION/index.php
+RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /opt/humhub-$VERSION/index.php
 
 # Run database migration tool
 #RUN php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1
 
-RUN find /opt/humhub-$version ! -user www-data -exec chown www-data: {} +
+RUN find /opt/humhub-$VERSION ! -user www-data -exec chown www-data: {} +
 
 # Expose Ports
 EXPOSE 443
