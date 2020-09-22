@@ -1,10 +1,10 @@
 variables:
     CONTAINER_RELEASE_IMAGE: docker.rz.tu-harburg.de:5000/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
-    LATEST_VERSION: '1.5'
+    LATEST_VERSION: '1.6'
     APP: 'HumHub'
     APP_OVERVIEW_URL: https://cgi.tu-harburg.de/~rztwww/Software/program_file.json
     KEY: "${APP} ${VERSION}"
-    MAPPING: '1:1.5'
+    MAPPING: '1:1.6'
 
 .build_script_template:
   script: &build_script_definition
@@ -14,8 +14,8 @@ variables:
     - if [[ -z $version ]] || [[ $version == "null" ]]; then exit 1; fi
     - version=$(echo $version | sed -e 's/%2B/+/g')
 
-    # - download=$(curl -s ${APP_OVERVIEW_URL} | jq --arg KEY "$KEY" --arg APP "$APP" --raw-output '.[$APP] | .[$KEY] | .download')
-    # - if [[ -z $download ]] || [[ $download == "null" ]]; then exit 1; fi
+    - download=$(curl -s ${APP_OVERVIEW_URL} | jq --arg KEY "$KEY" --arg APP "$APP" --raw-output '.[$APP] | .[$KEY] | .download')
+    - if [[ -z $download ]] || [[ $download == "null" ]]; then exit 1; fi
 
     - sudo docker build --build-arg DOWNLOAD="${download}" --build-arg VERSION="${version}" --no-cache --pull -t "${CONTAINER_RELEASE_IMAGE}":"${VERSION}${VARIANT:+-$VARIANT}" "${VERSION}"/"${VARIANT}"
 
@@ -27,8 +27,8 @@ variables:
     - if [[ -z $version ]] || [[ $version == "null" ]]; then exit 1; fi
     - version=$(echo $version | sed -e 's/%2B/+/g')
 
-    # - download=$(curl -s ${APP_OVERVIEW_URL} | jq --arg KEY "$KEY" --arg APP "$APP" --raw-output '.[$APP] | .[$KEY] | .download')
-    # - if [[ -z $download ]] || [[ $download == "null" ]]; then exit 1; fi
+    - download=$(curl -s ${APP_OVERVIEW_URL} | jq --arg KEY "$KEY" --arg APP "$APP" --raw-output '.[$APP] | .[$KEY] | .download')
+    - if [[ -z $download ]] || [[ $download == "null" ]]; then exit 1; fi
 
     - sudo docker build --build-arg DOWNLOAD="${download}" --build-arg VERSION="${version}" --pull -t "${CONTAINER_RELEASE_IMAGE}":"${VERSION}${VARIANT:+-$VARIANT}"_"${CI_COMMIT_REF_NAME}" "${VERSION}"/"${VARIANT}"    
 
@@ -44,20 +44,6 @@ variables:
         - sudo docker push "${CONTAINER_RELEASE_IMAGE}":"${VERSION}${VARIANT:+-$VARIANT}"
         - if [ ! -z ${LATEST_VERSION} ] && [ "${LATEST_VERSION}" == "${VERSION}${VARIANT:+-$VARIANT}" ]; then sudo docker tag "${CONTAINER_RELEASE_IMAGE}":"${VERSION}${VARIANT:+-$VARIANT}" "${CONTAINER_RELEASE_IMAGE}:latest"; sudo docker push "${CONTAINER_RELEASE_IMAGE}:latest"; fi
 
-.build_branches_script_template:
-    script:  &build_branches_script_definition
-        - pwd
-        - key="${APP} ${VERSION}"
-
-        - version=$(curl -s https://cgi.tu-harburg.de/~rztwww/Software/program_file.json | jq --arg KEY "$key" --raw-output '.[$KEY] | .version')
-        - if [[ -z $version ]]; then exit 1; fi
-        - version=$(echo $version | sed -e 's/%2B/+/g')
-
-        # - download=$(curl -s https://cgi.tu-harburg.de/~rztwww/Software/program_file.json | jq --arg KEY "$key" --raw-output '.[$KEY] | .download')
-        # - if [[ -z $download ]]; then exit 1; fi
-
-        - sudo docker build --build-arg DOWNLOAD="${download}" --build-arg VERSION="${version}" --no-cache --pull -t "${CONTAINER_RELEASE_IMAGE}":"${VERSION}${VARIANT:+-$VARIANT}"_"${CI_COMMIT_REF_NAME}" "${VERSION}"/"${VARIANT}"
-
 .build_branches_before_script_template:
     before_script:  &build_branches_before_script_definition
         - pwd
@@ -71,6 +57,60 @@ variables:
 stages:
     - build
     - deploy
+
+build:1.6:
+    stage: build
+    retry: 2
+    only:
+        - master
+    tags:
+        - build
+    variables:
+        VERSION: '1.6'
+        VARIANT: ''
+    before_script: *build_before_script_definition
+    script: *build_script_definition
+
+deploy:1.6:
+    stage: deploy
+    needs: ["build:1.6"]
+    tags:
+        - deploy
+    only:
+        - master
+    variables:
+        VERSION: '1.6'
+        VARIANT: ''
+    script: *deploy_script_definition
+
+build:branches:1.6:
+    stage: build
+    retry: 2
+    only:
+        - branches
+    except:
+        - master
+    tags:
+        - build
+    variables:
+        VERSION: '1.6'
+        VARIANT: ''
+    before_script: *build_branches_before_script_definition
+    script: *build_branches_script_definition
+
+deploy:branches:1.6:
+    stage: deploy
+    needs: ["build:branches:1.6"]
+    tags:
+        - deploy
+    only:
+        - branches
+    except:
+        - master
+    variables:
+        VERSION: '1.6'
+        VARIANT: ''
+    script: *deploy_branches_script_definition
 
 build:1.5:
     stage: build
