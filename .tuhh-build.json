@@ -25,6 +25,9 @@
         },
         "1.5": {
             "action": "build"
+        },
+        "1.6": {
+            "action": "build"
         }
     },
     "upgrade-check": {
