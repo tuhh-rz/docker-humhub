@@ -22,7 +22,7 @@ RUN apt-get install -y \
     rsync \
     supervisor \
     unzip \
-    wget
+    curl
 
 # Update base image
 # Add sources for latest nginx
@@ -88,13 +88,8 @@ ADD scripts/start.sh /start.sh
 RUN chmod 755 /start.sh
 
 # Download HumHub Community Edition
-RUN wget "$DOWNLOAD" -O /tmp/${VERSION}.tar.gz
-#RUN file "/tmp/latest.tar.gz"
-#ADD "https://www.humhub.org/de/download/default/start?version=${VERSION}&type=tar.gz&ee=0" /tmp/latest.tar.gz
-RUN tar xf /tmp/${VERSION}.tar.gz -C /tmp
-RUN mv /tmp/humhub-${VERSION} /tmp/humhub
-
-
+RUN curl $DOWNLOAD |\
+    tar -xzC /opt
 
 # Crontab
 #RUN echo "*/30 * * * * su -s /bin/bash -c '/usr/share/nginx/html/protected/yii cron/hourly' www-data >/dev/null 2>&1" >> /var/spool/cron/crontabs/root
@@ -114,6 +109,8 @@ RUN sed -i "s/^defined('YII_ENV')/\/\/defined('YII_ENV')/" /tmp/humhub/index.php
 
 # Run database migration tool
 #RUN php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1
+
+RUN find /opt/humhub-$version ! -user www-data -exec chown www-data: {} +
 
 # Expose Ports
 EXPOSE 443

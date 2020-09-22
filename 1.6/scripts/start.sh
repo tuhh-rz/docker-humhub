@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rsync -au /tmp/humhub/ /usr/share/nginx/html
+rsync -au /opt/humhub-"$VERSION"/ /usr/share/nginx/html
 
 # Display PHP error's or not
 if [[ "$ERRORS" != "1" ]]; then
@@ -19,8 +19,6 @@ rm -rf /usr/share/nginx/html/protected/runtime/cache
 # http://docs.humhub.org/admin-updating.html
 su -s /bin/sh -c 'yes | php /usr/share/nginx/html/protected/yii migrate/up --includeModuleMigrations=1' www-data
 su -s /bin/sh -c 'php /usr/share/nginx/html/protected/yii module/update-all' www-data
-
-find /usr/share/nginx/html/ ! -user www-data -exec chown www-data: {} +
 
 # Start supervisord and services
 exec /usr/bin/supervisord -n -c /etc/supervisord.conf
