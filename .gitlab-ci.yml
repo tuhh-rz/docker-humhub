@@ -69,8 +69,8 @@ build:incubator:1.6:
     tags:
         - build
     variables:
-            VERSION: '1.6'
-            VARIANT: ''
+        VERSION: '1.6'
+        VARIANT: ''
     before_script:
         - *build_branches_before_script_definition
     script:
@@ -176,13 +176,13 @@ deploy:branches:1.6:
 #     tags:
 #         - build
 #     variables:
-#             VERSION: '1.5'
-#             VARIANT: ''
+#         VERSION: '1.5'
+#         VARIANT: ''
 #     before_script:
 #         - *build_branches_before_script_definition
 #     script:
 #         - *build_branches_script_definition
-    
+
 # deploy:incubator:1.5:
 #     stage: deploy
 #     rules:
@@ -212,7 +212,7 @@ deploy:branches:1.6:
 #         - *build_before_script_definition
 #     script:
 #         - *build_script_definition
-    
+
 # deploy:1.5:
 #     needs: ["build:1.5"]
 #     stage: deploy
@@ -225,7 +225,7 @@ deploy:branches:1.6:
 #         VARIANT: ''
 #     script:
 #         - *deploy_script_definition
-    
+
 # build:branches:1.5:
 #     stage: build
 #     rules:
@@ -246,7 +246,7 @@ deploy:branches:1.6:
 #         - *build_branches_before_script_definition
 #     script:
 #         - *build_branches_script_definition
-    
+
 # deploy:branches:1.5:
 #     needs: ["build:branches:1.5"]
 #     stage: deploy
@@ -274,8 +274,8 @@ deploy:branches:1.6:
 #     tags:
 #         - build
 #     variables:
-#             VERSION: '1.4'
-#             VARIANT: ''
+#         VERSION: '1.4'
+#         VARIANT: ''
 #     before_script:
 #         - *build_branches_before_script_definition
 #     script:
@@ -310,7 +310,7 @@ deploy:branches:1.6:
 #         - *build_before_script_definition
 #     script:
 #         - *build_script_definition
-    
+
 # deploy:1.4:
 #     needs: ["build:1.4"]
 #     stage: deploy
@@ -323,9 +323,9 @@ deploy:branches:1.6:
 #         VARIANT: ''
 #     script:
 #         - *deploy_script_definition
-    
+
 # build:branches:1.4:
-#     stage: build  
+#     stage: build
 #     rules:
 #         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
 #           when: never
@@ -344,7 +344,7 @@ deploy:branches:1.6:
 #         - *build_branches_before_script_definition
 #     script:
 #         - *build_branches_script_definition
-    
+
 # deploy:branches:1.4:
 #     needs: ["build:branches:1.4"]
 #     stage: deploy
@@ -372,13 +372,13 @@ deploy:branches:1.6:
 #     tags:
 #         - build
 #     variables:
-#             VERSION: '1.3'
-#             VARIANT: ''
+#         VERSION: '1.3'
+#         VARIANT: ''
 #     before_script:
 #         - *build_branches_before_script_definition
 #     script:
 #         - *build_branches_script_definition
-    
+
 # deploy:incubator:1.3:
 #     stage: deploy
 #     rules:
@@ -391,7 +391,7 @@ deploy:branches:1.6:
 #         VARIANT: ""
 #     script:
 #         - *deploy_branches_script_definition
-    
+
 # build:1.3:
 #     stage: build
 #     rules:
@@ -408,7 +408,7 @@ deploy:branches:1.6:
 #         - *build_before_script_definition
 #     script:
 #         - *build_script_definition
-    
+
 # deploy:1.3:
 #     needs: ["build:1.3"]
 #     stage: deploy
@@ -421,9 +421,9 @@ deploy:branches:1.6:
 #         VARIANT: ''
 #     script:
 #         - *deploy_script_definition
-    
+
 # build:branches:1.3:
-#     stage: build  
+#     stage: build
 #     rules:
 #         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
 #           when: never
@@ -442,7 +442,7 @@ deploy:branches:1.6:
 #         - *build_branches_before_script_definition
 #     script:
 #         - *build_branches_script_definition
-    
+
 # deploy:branches:1.3:
 #     needs: ["build:branches:1.3"]
 #     stage: deploy
