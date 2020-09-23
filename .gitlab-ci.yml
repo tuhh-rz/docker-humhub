@@ -6,6 +6,12 @@ variables:
     KEY: "${APP} ${VERSION}"
     MAPPING: '1:1.6'
 
+# https://docs.gitlab.com/ee/ci/yaml/README.html#exclude-jobs-with-rules-from-certain-pipelines
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH
+
 .build_script_template: &build_script_definition
   - KEY="${KEY#"${KEY%%[![:space:]]*}"}"
   - KEY="${KEY%"${KEY##*[![:space:]]}"}"
@@ -93,8 +99,6 @@ build:1.6:
     stage: build
     rules:
         - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
-          when: never
-        - if: '$BUILD_VERSIONS != "" && $BUILD_VERSIONS != $VERSION '
           when: never
         - when: always
     retry:
