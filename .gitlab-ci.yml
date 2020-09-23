@@ -5,7 +5,7 @@ variables:
     APP_OVERVIEW_URL: https://cgi.tu-harburg.de/~rztwww/Software/program_file.json
     KEY: "${APP} ${VERSION}"
     MAPPING: '1:1.6'
-    BUILD_VERSIONS: ''
+    BUILD_VERSIONS: '' # Use Pipeline Variables to overwrite
 
 # https://docs.gitlab.com/ee/ci/yaml/README.html#exclude-jobs-with-rules-from-certain-pipelines
 workflow:
@@ -62,6 +62,15 @@ workflow:
 .deploy_branches_script_template: &deploy_branches_script_definition
   - sudo docker push "${CONTAINER_RELEASE_IMAGE}":"${VERSION:-latest}${VARIANT:+-$VARIANT}"_"${CI_COMMIT_REF_SLUG}"
 
+.default_rules: &default_rules
+    - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
+      when: never
+    - if: '$BUILD_VERSIONS == ""'
+      when: always
+    - if: '$BUILD_VERSIONS == $VERSION'
+      when: always
+    - when: never
+
 stages:
     - build
     - deploy
@@ -99,13 +108,7 @@ deploy:incubator:1.6:
 build:1.6:
     stage: build
     rules:
-        - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
-          when: never
-        - if: '$BUILD_VERSIONS == ""'
-          when: always
-        - if: '$BUILD_VERSIONS == $VERSION'
-          when: always
-        - when: never
+        <<: *default_rules
     retry:
         max: 1
         when: runner_system_failure
@@ -125,13 +128,7 @@ deploy:1.6:
     tags:
         - deploy
     rules:
-        - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
-          when: never
-        - if: '$BUILD_VERSIONS == ""'
-          when: always
-        - if: '$BUILD_VERSIONS == $VERSION'
-          when: always
-        - when: never
+        <<: *default_rules
     variables:
         VERSION: '1.6'
         VARIANT: ''
