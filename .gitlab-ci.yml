@@ -5,6 +5,7 @@ variables:
     APP_OVERVIEW_URL: https://cgi.tu-harburg.de/~rztwww/Software/program_file.json
     KEY: "${APP} ${VERSION}"
     MAPPING: '1:1.6'
+    BUILD_VERSIONS: ''
 
 # https://docs.gitlab.com/ee/ci/yaml/README.html#exclude-jobs-with-rules-from-certain-pipelines
 workflow:
