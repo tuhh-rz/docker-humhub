@@ -104,6 +104,7 @@ build:1.6:
           when: always
         - if: '$BUILD_VERSIONS == $VERSION'
           when: always
+        - when: always
     retry:
         max: 1
         when: runner_system_failure
@@ -129,6 +130,7 @@ deploy:1.6:
           when: always
         - if: '$BUILD_VERSIONS == $VERSION'
           when: always
+        - when: always
     variables:
         VERSION: '1.6'
         VARIANT: ''
