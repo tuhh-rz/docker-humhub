@@ -5,7 +5,7 @@ variables:
     APP_OVERVIEW_URL: https://cgi.tu-harburg.de/~rztwww/Software/program_file.json
     KEY: "${APP} ${VERSION}"
     MAPPING: '1:1.6'
-    BUILD_VERSIONS: '' # Use Pipeline Variables to overwrite
+    BUILD_VERSION: '' # Use Pipeline Variables to overwrite
 
 # https://docs.gitlab.com/ee/ci/yaml/README.html#exclude-jobs-with-rules-from-certain-pipelines
 workflow:
@@ -66,9 +66,32 @@ workflow:
     rules:
     - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
       when: never
-    - if: '$BUILD_VERSIONS == ""'
+    - if: '$BUILD_VERSION == ""'
       when: always
-    - if: '$BUILD_VERSIONS == $VERSION'
+    - if: '$BUILD_VERSION == $VERSION'
+      when: always
+    - when: never
+
+.incubator_rules: &incubator_rules
+    rules:
+    - if: '$CI_COMMIT_REF_NAME != "incubator"'
+      when: never
+    - if: '$BUILD_VERSION == ""'
+      when: always
+    - if: '$BUILD_VERSION == $VERSION'
+      when: always
+    - when: never
+
+
+.branches_rules: &branches_rules
+    rules:
+    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+      when: never
+    - if: '$CI_COMMIT_REF_NAME == "incubator"'
+      when: never
+    - if: '$BUILD_VERSION == ""'
+      when: always
+    - if: '$BUILD_VERSION == $VERSION'
       when: always
     - when: never
 
@@ -78,8 +101,7 @@ stages:
 
 build:incubator:1.6:
     stage: build
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
+    <<: *incubator_rules
     retry:
         max: 1
         when: runner_system_failure
@@ -95,8 +117,7 @@ build:incubator:1.6:
 
 deploy:incubator:1.6:
     stage: deploy
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
+    <<: *incubator_rules
     needs: ["build:incubator:1.6"]
     tags:
         - deploy
@@ -135,13 +156,8 @@ deploy:1.6:
         - *deploy_script_definition
     
 build:branches:1.6:
-    stage: build  
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
-          when: never
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
-          when: never
-        - when: always
+    stage: build
+    <<: *branches_rules
     retry:
         max: 1
         when: runner_system_failure
@@ -160,12 +176,7 @@ deploy:branches:1.6:
     stage: deploy
     tags:
         - deploy
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
-          when: never
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
-          when: never
-        - when: always
+    <<: *branches_rules
     variables:
         VERSION: '1.6'
         VARIANT: ''
@@ -175,8 +186,7 @@ deploy:branches:1.6:
 
 build:incubator:1.5:
     stage: build
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
+    <<: *incubator_rules
     retry:
         max: 1
         when: runner_system_failure
@@ -192,8 +202,7 @@ build:incubator:1.5:
 
 deploy:incubator:1.5:
     stage: deploy
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
+    <<: *incubator_rules
     needs: ["build:incubator:1.5"]
     tags:
         - deploy
@@ -233,12 +242,7 @@ deploy:1.5:
 
 build:branches:1.5:
     stage: build
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
-          when: never
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
-          when: never
-        - when: always
+    <<: *branches_rules
     retry:
         max: 1
         when: runner_system_failure
@@ -257,12 +261,7 @@ deploy:branches:1.5:
     stage: deploy
     tags:
         - deploy
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
-          when: never
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
-          when: never
-        - when: always
+    <<: *branches_rules
     variables:
         VERSION: '1.5'
         VARIANT: ''
@@ -271,8 +270,7 @@ deploy:branches:1.5:
 
 build:incubator:1.4:
     stage: build
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
+    <<: *incubator_rules
     retry:
         max: 1
         when: runner_system_failure
@@ -288,8 +286,7 @@ build:incubator:1.4:
 
 deploy:incubator:1.4:
     stage: deploy
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
+    <<: *incubator_rules
     needs: ["build:incubator:1.4"]
     tags:
         - deploy
@@ -329,12 +326,7 @@ deploy:1.4:
 
 build:branches:1.4:
     stage: build
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
-          when: never
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
-          when: never
-        - when: always
+    <<: *branches_rules
     retry:
         max: 1
         when: runner_system_failure
@@ -353,12 +345,7 @@ deploy:branches:1.4:
     stage: deploy
     tags:
         - deploy
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
-          when: never
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
-          when: never
-        - when: always
+    <<: *branches_rules
     variables:
         VERSION: '1.4'
         VARIANT: ''
@@ -367,8 +354,7 @@ deploy:branches:1.4:
 
 build:incubator:1.3:
     stage: build
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
+    <<: *incubator_rules
     retry:
         max: 1
         when: runner_system_failure
@@ -384,8 +370,7 @@ build:incubator:1.3:
 
 deploy:incubator:1.3:
     stage: deploy
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
+    <<: *incubator_rules
     needs: ["build:incubator:1.3"]
     tags:
         - deploy
@@ -425,12 +410,7 @@ deploy:1.3:
 
 build:branches:1.3:
     stage: build
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
-          when: never
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
-          when: never
-        - when: always
+    <<: *branches_rules
     retry:
         max: 1
         when: runner_system_failure
@@ -449,12 +429,7 @@ deploy:branches:1.3:
     stage: deploy
     tags:
         - deploy
-    rules:
-        - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
-          when: never
-        - if: '$CI_COMMIT_REF_NAME == "incubator"'
-          when: never
-        - when: always
+    <<: *branches_rules
     variables:
         VERSION: '1.3'
         VARIANT: ''
