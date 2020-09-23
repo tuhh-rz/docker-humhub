@@ -100,9 +100,10 @@ build:1.6:
     rules:
         - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
           when: never
-        - if: '$BUILD_VERSIONS != "" && $BUILD_VERSIONS != $VERSION'
-          when: never
-        - when: always
+        - if: '$BUILD_VERSIONS == ""'
+          when: always
+        - if: '$BUILD_VERSIONS == $VERSION'
+          when: always
     retry:
         max: 1
         when: runner_system_failure
@@ -128,7 +129,6 @@ deploy:1.6:
           when: always
         - if: '$BUILD_VERSIONS == $VERSION'
           when: always
-        - when: never
     variables:
         VERSION: '1.6'
         VARIANT: ''
@@ -138,13 +138,11 @@ deploy:1.6:
 build:branches:1.6:
     stage: build  
     rules:
-        - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
+        - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
           when: never
-        - if: '$BUILD_VERSIONS == ""'
-          when: always
-        - if: '$BUILD_VERSIONS == $VERSION'
-          when: always
-        - when: never
+        - if: '$CI_COMMIT_REF_NAME == "incubator"'
+          when: never
+        - when: always
     retry:
         max: 1
         when: runner_system_failure
