@@ -1,274 +1,461 @@
 variables:
     CONTAINER_RELEASE_IMAGE: docker.rz.tu-harburg.de:5000/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
     LATEST_VERSION: '1.6'
-    APP: 'HumHub'
+    APP: 'APP_NAME'
     APP_OVERVIEW_URL: https://cgi.tu-harburg.de/~rztwww/Software/program_file.json
     KEY: "${APP} ${VERSION}"
     MAPPING: '1:1.6'
 
-.build_script_template:
-  script: &build_script_definition
-    - pwd
+.build_script_template: &build_script_definition
+  - KEY="${KEY#"${KEY%%[![:space:]]*}"}"
+  - KEY="${KEY%"${KEY##*[![:space:]]}"}"
+  - DOCKERFILE_DIR="${VERSION}"/"${VARIANT}"
+  - if [[ "$DOCKERFILE_DIR" =~ ^/$ ]]; then DOCKERFILE_DIR='.'; fi
 
-    - version=$(curl -s ${APP_OVERVIEW_URL} | jq --arg KEY "$KEY" --arg APP "$APP" --raw-output '.[$APP] | .[$KEY] | .version')
-    - if [[ -z $version ]] || [[ $version == "null" ]]; then exit 1; fi
-    - version=$(echo $version | sed -e 's/%2B/+/g')
+  - structure=$(curl -s ${APP_OVERVIEW_URL} | jq --arg KEY "$KEY" --arg APP "$APP" --raw-output '.[$APP] | .[$KEY]')
+  - if [[ -z "$structure" ]] || [[ $structure == "null" ]]; then echo "UNKNOWN $APP $KEY"; exit 0; fi
 
-    - download=$(curl -s ${APP_OVERVIEW_URL} | jq --arg KEY "$KEY" --arg APP "$APP" --raw-output '.[$APP] | .[$KEY] | .download')
-    - if [[ -z $download ]] || [[ $download == "null" ]]; then exit 1; fi
+  - version=$(jq --raw-output '.version' <<<"$structure")
+  - if [[ -z $version ]] || [[ $version == "null" ]]; then exit 1; fi
+  - version=$(echo $version | sed -e 's/%2B/+/g')
 
-    - sudo docker build --build-arg DOWNLOAD="${download}" --build-arg VERSION="${version}" --no-cache --pull -t "${CONTAINER_RELEASE_IMAGE}":"${VERSION}${VARIANT:+-$VARIANT}" "${VERSION}"/"${VARIANT}"
+  - download=$(jq --raw-output '.download' <<<"$structure")
+  - if [[ -z $download ]] || [[ $download == "null" ]]; then exit 1; fi
 
-.build_branches_script_template:
-  script: &build_branches_script_definition
-    - pwd
+  - sudo docker build --build-arg DOWNLOAD="${download}" --build-arg VERSION="${version}" --no-cache --pull -t "${CONTAINER_RELEASE_IMAGE}":"${VERSION:-latest}${VARIANT:+-$VARIANT}" "${DOCKERFILE_DIR}"
 
-    - version=$(curl -s ${APP_OVERVIEW_URL} | jq --arg KEY "$KEY" --arg APP "$APP" --raw-output '.[$APP] | .[$KEY] | .version')
-    - if [[ -z $version ]] || [[ $version == "null" ]]; then exit 1; fi
-    - version=$(echo $version | sed -e 's/%2B/+/g')
+.build_branches_script_template: &build_branches_script_definition
+  - KEY="${KEY#"${KEY%%[![:space:]]*}"}"
+  - KEY="${KEY%"${KEY##*[![:space:]]}"}"
+  - DOCKERFILE_DIR="${VERSION}"/"${VARIANT}"
+  - if [[ "$DOCKERFILE_DIR" =~ ^/$ ]]; then DOCKERFILE_DIR='.'; fi
+  
+  - structure=$(curl -s ${APP_OVERVIEW_URL} | jq --arg KEY "$KEY" --arg APP "$APP" --raw-output '.[$APP] | .[$KEY]')
+  - if [[ -z "$structure" ]] || [[ $structure == "null" ]]; then echo "UNKNOWN $APP $KEY"; exit 0; fi
 
-    - download=$(curl -s ${APP_OVERVIEW_URL} | jq --arg KEY "$KEY" --arg APP "$APP" --raw-output '.[$APP] | .[$KEY] | .download')
-    - if [[ -z $download ]] || [[ $download == "null" ]]; then exit 1; fi
+  - version=$(jq --raw-output '.version' <<<"$structure")
+  - if [[ -z $version ]] || [[ $version == "null" ]]; then exit 1; fi
+  - version=$(echo $version | sed -e 's/%2B/+/g')
 
-    - sudo docker build --build-arg DOWNLOAD="${download}" --build-arg VERSION="${version}" --pull -t "${CONTAINER_RELEASE_IMAGE}":"${VERSION}${VARIANT:+-$VARIANT}"_"${CI_COMMIT_REF_NAME}" "${VERSION}"/"${VARIANT}"    
+  # - download=$(jq --raw-output '.download' <<<"$structure")
+  # - if [[ -z $download ]] || [[ $download == "null" ]]; then exit 1; fi
 
-.build_before_script_template:
-  before_script: &build_before_script_definition
-    - pwd
-    - git submodule update --init --recursive
+  - sudo docker build --build-arg DOWNLOAD="${download}" --build-arg VERSION="${version}" --pull -t "${CONTAINER_RELEASE_IMAGE}":"${VERSION:-latest}${VARIANT:+-$VARIANT}"_"${CI_COMMIT_REF_SLUG}" "${DOCKERFILE_DIR}"
 
-.deploy_script_template:
-  script: &deploy_script_definition
-    - pwd
-    - sudo docker push "${CONTAINER_RELEASE_IMAGE}":"${VERSION}${VARIANT:+-$VARIANT}"
-    - if [ ! -z ${LATEST_VERSION} ] && [ "${LATEST_VERSION}" == "${VERSION}${VARIANT:+-$VARIANT}" ]; then sudo docker tag "${CONTAINER_RELEASE_IMAGE}":"${VERSION}${VARIANT:+-$VARIANT}" "${CONTAINER_RELEASE_IMAGE}:latest"; sudo docker push "${CONTAINER_RELEASE_IMAGE}:latest"; fi
+.build_before_script_template: &build_before_script_definition
+  - git submodule update --init --recursive
 
-.build_branches_before_script_template:
-  before_script: &build_branches_before_script_definition
-    - pwd
-    - git submodule update --init --recursive
+.deploy_script_template: &deploy_script_definition
+  - sudo docker push "${CONTAINER_RELEASE_IMAGE}":"${VERSION:-latest}${VARIANT:+-$VARIANT}"
+  - if [ ! -z ${LATEST_VERSION} ] && [ "${LATEST_VERSION}" == "${VERSION}${VARIANT:+-$VARIANT}" ]; then sudo docker tag "${CONTAINER_RELEASE_IMAGE}":"${VERSION:-latest}${VARIANT:+-$VARIANT}" "${CONTAINER_RELEASE_IMAGE}:latest"; sudo docker push "${CONTAINER_RELEASE_IMAGE}:latest"; fi
 
-.deploy_branches_script_template:
-  script: &deploy_branches_script_definition
-    - pwd
-    - sudo docker push "${CONTAINER_RELEASE_IMAGE}":"${VERSION}${VARIANT:+-$VARIANT}"_"${CI_COMMIT_REF_NAME}"
+.build_branches_before_script_template: &build_branches_before_script_definition
+  - git submodule update --init --recursive
+
+.deploy_branches_script_template: &deploy_branches_script_definition
+  - sudo docker push "${CONTAINER_RELEASE_IMAGE}":"${VERSION:-latest}${VARIANT:+-$VARIANT}"_"${CI_COMMIT_REF_SLUG}"
 
 stages:
     - build
     - deploy
 
-# build:1.6:
+build:incubator:1.6:
+    stage: build
+    rules:
+        - if: '$CI_COMMIT_REF_NAME == "incubator"'
+    retry:
+        max: 1
+        when: runner_system_failure
+    tags:
+        - build
+    variables:
+            VERSION: '1.6'
+            VARIANT: ''
+    before_script:
+        - *build_branches_before_script_definition
+    script:
+        - *build_branches_script_definition
+
+deploy:incubator:1.6:
+    stage: deploy
+    rules:
+        - if: '$CI_COMMIT_REF_NAME == "incubator"'
+    needs: ["build:incubator:1.6:"]
+    tags:
+        - deploy
+    variables:
+        VERSION: "1.6"
+        VARIANT: ""
+    script:
+        - *deploy_branches_script_definition
+
+build:1.6:
+    stage: build
+    rules:
+        - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
+          when: never
+        - if: '$BUILD_VERSIONS != "" && $BUILD_VERSIONS != $VERSION '
+          when: never
+        - when: always
+    retry:
+        max: 1
+        when: runner_system_failure
+    tags:
+        - build
+    variables:
+        VERSION: '1.6'
+        VARIANT: ''
+    before_script:
+        - *build_before_script_definition
+    script:
+        - *build_script_definition
+    
+deploy:1.6:
+    needs: ["build:1.6"]
+    stage: deploy
+    tags:
+        - deploy
+    rules:
+        - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
+          when: never
+        - if: '$BUILD_VERSIONS != "" && $BUILD_VERSIONS != $VERSION '
+          when: never
+        - when: always
+    variables:
+        VERSION: '1.6'
+        VARIANT: ''
+    script:
+        - *deploy_script_definition
+    
+build:branches:1.6:
+    stage: build  
+    rules:
+        - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+          when: never
+        - if: '$CI_COMMIT_REF_NAME == "incubator"'
+          when: never
+        - when: always
+    retry:
+        max: 1
+        when: runner_system_failure
+    tags:
+        - build
+    variables:
+        VERSION: '1.6'
+        VARIANT: ''
+    before_script:
+        - *build_branches_before_script_definition
+    script:
+        - *build_branches_script_definition
+    
+deploy:branches:1.6:
+    needs: ["build:branches:1.6"]
+    stage: deploy
+    tags:
+        - deploy
+    rules:
+        - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+          when: never
+        - if: '$CI_COMMIT_REF_NAME == "incubator"'
+          when: never
+        - when: always
+    variables:
+        VERSION: '1.6'
+        VARIANT: ''
+    script:
+        - *deploy_branches_script_definition
+
+
+# build:incubator:1.5:
 #     stage: build
-#     retry: 2
-#     only:
-#         - master
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == "incubator"'
+#     retry:
+#         max: 1
+#         when: runner_system_failure
 #     tags:
 #         - build
 #     variables:
-#         VERSION: '1.6'
-#         VARIANT: ''
-#     before_script: *build_before_script_definition
-#     script: *build_script_definition
-
-# deploy:1.6:
+#             VERSION: '1.5'
+#             VARIANT: ''
+#     before_script:
+#         - *build_branches_before_script_definition
+#     script:
+#         - *build_branches_script_definition
+    
+# deploy:incubator:1.5:
 #     stage: deploy
-#     needs: ["build:1.6"]
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == "incubator"'
+#     needs: ["build:incubator:1.5:"]
 #     tags:
 #         - deploy
-#     only:
-#         - master
 #     variables:
-#         VERSION: '1.6'
-#         VARIANT: ''
-#     script: *deploy_script_definition
-
-# build:branches:1.6:
-#     stage: build
-#     retry: 2
-#     only:
-#         - branches
-#     except:
-#         - master
-#     tags:
-#         - build
-#     variables:
-#         VERSION: '1.6'
-#         VARIANT: ''
-#     before_script: *build_branches_before_script_definition
-#     script: *build_branches_script_definition
-
-# deploy:branches:1.6:
-#     stage: deploy
-#     needs: ["build:branches:1.6"]
-#     tags:
-#         - deploy
-#     only:
-#         - branches
-#     except:
-#         - master
-#     variables:
-#         VERSION: '1.6'
-#         VARIANT: ''
-#     script: *deploy_branches_script_definition
+#         VERSION: "1.5"
+#         VARIANT: ""
+#     script:
+#         - *deploy_branches_script_definition
 
 # build:1.5:
 #     stage: build
-#     retry: 2
-#     only:
-#         - master
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+#     retry:
+#         max: 1
+#         when: runner_system_failure
 #     tags:
 #         - build
 #     variables:
 #         VERSION: '1.5'
 #         VARIANT: ''
-#     before_script: *build_before_script_definition
-#     script: *build_script_definition
-
+#     before_script:
+#         - *build_before_script_definition
+#     script:
+#         - *build_script_definition
+    
 # deploy:1.5:
-#     stage: deploy
 #     needs: ["build:1.5"]
+#     stage: deploy
 #     tags:
 #         - deploy
-#     only:
-#         - master
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
 #     variables:
 #         VERSION: '1.5'
 #         VARIANT: ''
-#     script: *deploy_script_definition
-
+#     script:
+#         - *deploy_script_definition
+    
 # build:branches:1.5:
 #     stage: build
-#     retry: 2
-#     only:
-#         - branches
-#     except:
-#         - master
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+#           when: never
+#         - if: '$CI_COMMIT_REF_NAME == "incubator"'
+#           when: never
+#         - when: always
+#     retry:
+#         max: 1
+#         when: runner_system_failure
 #     tags:
 #         - build
 #     variables:
 #         VERSION: '1.5'
 #         VARIANT: ''
-#     before_script: *build_branches_before_script_definition
-#     script: *build_branches_script_definition
-
+#     before_script:
+#         - *build_branches_before_script_definition
+#     script:
+#         - *build_branches_script_definition
+    
 # deploy:branches:1.5:
-#     stage: deploy
 #     needs: ["build:branches:1.5"]
+#     stage: deploy
 #     tags:
 #         - deploy
-#     only:
-#         - branches
-#     except:
-#         - master
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+#           when: never
+#         - if: '$CI_COMMIT_REF_NAME == "incubator"'
+#           when: never
+#         - when: always
 #     variables:
 #         VERSION: '1.5'
 #         VARIANT: ''
-#     script: *deploy_branches_script_definition
+#     script:
+#         - *deploy_branches_script_definition
+
+# build:incubator:1.4:
+#     stage: build
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == "incubator"'
+#     retry:
+#         max: 1
+#         when: runner_system_failure
+#     tags:
+#         - build
+#     variables:
+#             VERSION: '1.4'
+#             VARIANT: ''
+#     before_script:
+#         - *build_branches_before_script_definition
+#     script:
+#         - *build_branches_script_definition
+
+# deploy:incubator:1.4:
+#     stage: deploy
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == "incubator"'
+#     needs: ["build:incubator:1.4:"]
+#     tags:
+#         - deploy
+#     variables:
+#         VERSION: "1.4"
+#         VARIANT: ""
+#     script:
+#         - *deploy_branches_script_definition
 
 # build:1.4:
 #     stage: build
-#     retry: 2
-#     only:
-#         - master
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+#     retry:
+#         max: 1
+#         when: runner_system_failure
 #     tags:
 #         - build
 #     variables:
 #         VERSION: '1.4'
 #         VARIANT: ''
-#     before_script: *build_before_script_definition
-#     script: *build_script_definition
-
+#     before_script:
+#         - *build_before_script_definition
+#     script:
+#         - *build_script_definition
+    
 # deploy:1.4:
-#     stage: deploy
 #     needs: ["build:1.4"]
+#     stage: deploy
 #     tags:
 #         - deploy
-#     only:
-#         - master
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
 #     variables:
 #         VERSION: '1.4'
 #         VARIANT: ''
-#     script: *deploy_script_definition
-
+#     script:
+#         - *deploy_script_definition
+    
 # build:branches:1.4:
-#     stage: build
-#     retry: 2
-#     only:
-#         - branches
-#     except:
-#         - master
+#     stage: build  
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+#           when: never
+#         - if: '$CI_COMMIT_REF_NAME == "incubator"'
+#           when: never
+#         - when: always
+#     retry:
+#         max: 1
+#         when: runner_system_failure
 #     tags:
 #         - build
 #     variables:
 #         VERSION: '1.4'
 #         VARIANT: ''
-#     before_script: *build_branches_before_script_definition
-#     script: *build_branches_script_definition
-
+#     before_script:
+#         - *build_branches_before_script_definition
+#     script:
+#         - *build_branches_script_definition
+    
 # deploy:branches:1.4:
-#     stage: deploy
 #     needs: ["build:branches:1.4"]
+#     stage: deploy
 #     tags:
 #         - deploy
-#     only:
-#         - branches
-#     except:
-#         - master
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+#           when: never
+#         - if: '$CI_COMMIT_REF_NAME == "incubator"'
+#           when: never
+#         - when: always
 #     variables:
 #         VERSION: '1.4'
 #         VARIANT: ''
-#     script: *deploy_branches_script_definition
+#     script:
+#         - *deploy_branches_script_definition
 
-build:1.3:
-    stage: build
-    retry: 2
-    only:
-        - master
-    tags:
-        - build
-    variables:
-        VERSION: '1.3'
-        VARIANT: ''
-    before_script: *build_before_script_definition
-    script: *build_script_definition
-
-deploy:1.3:
-    stage: deploy
-    needs: ["build:1.3"]
-    tags:
-        - deploy
-    only:
-        - master
-    variables:
-        VERSION: '1.3'
-        VARIANT: ''
-    script: *deploy_script_definition
-
-build:branches:1.3:
-    stage: build
-    retry: 2
-    only:
-        - branches
-    except:
-        - master
-    tags:
-        - build
-    variables:
-        VERSION: '1.3'
-        VARIANT: ''
-    before_script: *build_branches_before_script_definition
-    script: *build_branches_script_definition
-
-deploy:branches:1.3:
-    stage: deploy
-    needs: ["build:branches:1.3"]
-    tags:
-        - deploy
-    only:
-        - branches
-    except:
-        - master
-    variables:
-        VERSION: '1.3'
-        VARIANT: ''
-    script: *deploy_branches_script_definition
+# build:incubator:1.3:
+#     stage: build
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == "incubator"'
+#     retry:
+#         max: 1
+#         when: runner_system_failure
+#     tags:
+#         - build
+#     variables:
+#             VERSION: '1.3'
+#             VARIANT: ''
+#     before_script:
+#         - *build_branches_before_script_definition
+#     script:
+#         - *build_branches_script_definition
+    
+# deploy:incubator:1.3:
+#     stage: deploy
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == "incubator"'
+#     needs: ["build:incubator:1.3:"]
+#     tags:
+#         - deploy
+#     variables:
+#         VERSION: "1.3"
+#         VARIANT: ""
+#     script:
+#         - *deploy_branches_script_definition
+    
+# build:1.3:
+#     stage: build
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+#     retry:
+#         max: 1
+#         when: runner_system_failure
+#     tags:
+#         - build
+#     variables:
+#         VERSION: '1.3'
+#         VARIANT: ''
+#     before_script:
+#         - *build_before_script_definition
+#     script:
+#         - *build_script_definition
+    
+# deploy:1.3:
+#     needs: ["build:1.3"]
+#     stage: deploy
+#     tags:
+#         - deploy
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+#     variables:
+#         VERSION: '1.3'
+#         VARIANT: ''
+#     script:
+#         - *deploy_script_definition
+    
+# build:branches:1.3:
+#     stage: build  
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+#           when: never
+#         - if: '$CI_COMMIT_REF_NAME == "incubator"'
+#           when: never
+#         - when: always
+#     retry:
+#         max: 1
+#         when: runner_system_failure
+#     tags:
+#         - build
+#     variables:
+#         VERSION: '1.3'
+#         VARIANT: ''
+#     before_script:
+#         - *build_branches_before_script_definition
+#     script:
+#         - *build_branches_script_definition
+    
+# deploy:branches:1.3:
+#     needs: ["build:branches:1.3"]
+#     stage: deploy
+#     tags:
+#         - deploy
+#     rules:
+#         - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+#           when: never
+#         - if: '$CI_COMMIT_REF_NAME == "incubator"'
+#           when: never
+#         - when: always
+#     variables:
+#         VERSION: '1.3'
+#         VARIANT: ''
+#     script:
+#         - *deploy_branches_script_definition
