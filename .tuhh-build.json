@@ -12,7 +12,7 @@
             "state": "ignore"
         },
         {
-            "name": "docker.rz.tu-harburg.de",
+            "name": "docker.rz.tu-harburg.de:5000",
             "state": "present"
         }
     ],
@@ -24,6 +24,9 @@
             "action": "build"
         },
         "1.5": {
+            "action": "build"
+        },
+        "1.6": {
             "action": "build"
         }
     },
